@@ -2,7 +2,7 @@
 # Copyright (c) 2022, KarjaKAK
 # All rights reserved.
 
-import os
+import os, sys
 import stat
 import subprocess as sp
 import argparse
@@ -31,18 +31,40 @@ class FilePermission:
         Sequence mode checking
         """
 
-        ck = [str(n) for n in range(8)]
+        ck = [str(n) for n in range(1,8)]
         match seq:
             case seq if not isinstance(seq, int):
                 raise TypeError("Must be integer!")
+            case 0:
+                warn = input(
+                    "WARNING: file will be locked and any undesire behaviour may happen! [n/y] "
+                )
+                match warn.lower():
+                    case 'y':
+                        self.seq = 000
+                    case _:
+                        sys.exit()
             case seq if not len(str(seq)) == 3:
                 raise ValueError(f"{seq} is invalid!")
             case _:
                 for i in str(seq):
                     if not i in ck:
-                        raise ValueError(
-                            f"{i} is not permission sequence mode for file!"
-                        )
+                        match i:
+                            case '0':
+                                warn = input(
+                                    f"WARNING: file will be locked for some users and any undesire" 
+                                    f" behaviour may happen! [n/y] "
+                                )
+                                match warn.lower():
+                                    case 'y':
+                                        self.seq = seq
+                                        break
+                                    case _:
+                                        sys.exit()
+                            case _:
+                                raise ValueError(
+                                    f"{i} is not permission sequence mode for file!"
+                                )
                 else:
                     self.seq = seq
         del ck
@@ -51,8 +73,8 @@ class FilePermission:
         """
         File permission changer
         """
-
         self._chkseq(nums)
+
         pnam = [
             "chmod",
             f"{self.seq}",
