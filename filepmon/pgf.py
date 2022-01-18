@@ -19,8 +19,8 @@ class FilePermission:
 
     def __init__(self, filep: str):
         match filep:
-            case filep if not os.path.isfile(filep):
-                raise TypeError("Is not a file type!")
+            case filep if not os.path.exists(filep):
+                raise TypeError(f"{filep} Is not exist!")
             case _:
                 self.filep = filep
         self.seq = None
@@ -58,7 +58,6 @@ class FilePermission:
                                 match warn.lower():
                                     case 'y':
                                         self.seq = seq
-                                        break
                                     case _:
                                         sys.exit()
                             case _:
