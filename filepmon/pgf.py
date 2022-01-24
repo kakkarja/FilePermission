@@ -26,7 +26,7 @@ class FilePermission:
         self.seq = None
         self.seqp = []
 
-    def _chkseq(self, seq: int):
+    def _chkseq(self, seq: int, sil: bool = False):
         """
         Sequence mode checking
         """
@@ -34,11 +34,13 @@ class FilePermission:
         ck = [str(n) for n in range(1,8)]
         match seq:
             case seq if not isinstance(seq, int):
-                raise TypeError("Must be integer!")
+                raise TypeError(f"{seq} is not integer!")
+            case seq if not isinstance(sil, bool):
+                raise TypeError(f"{sil} is not bool type!")
             case 0:
                 warn = input(
                     "WARNING: file will be locked and any undesire behaviour may happen! [n/y] "
-                )
+                ) if sil is False else 'Y'
                 match warn.lower():
                     case 'y':
                         self.seq = 000
@@ -54,7 +56,7 @@ class FilePermission:
                                 warn = input(
                                     f"WARNING: file will be locked for some users and any undesire" 
                                     f" behaviour may happen! [n/y] "
-                                )
+                                ) if sil is False else 'Y'
                                 match warn.lower():
                                     case 'y':
                                         self.seq = seq
@@ -68,11 +70,11 @@ class FilePermission:
                     self.seq = seq
         del ck
 
-    def changeperm(self, nums: int):
+    def changeperm(self, nums: int, sil: bool = False):
         """
         File permission changer
         """
-        self._chkseq(nums)
+        self._chkseq(nums, sil)
 
         pnam = [
             "chmod",
